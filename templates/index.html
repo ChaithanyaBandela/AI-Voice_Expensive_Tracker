@@ -2,8 +2,13 @@
 <html>
 
 <head>
+
 <title>AI Voice Expense Tracker</title>
+
 <link rel="stylesheet" href="/static/style.css">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head>
 
 <body>
@@ -22,9 +27,15 @@
 <th>Amount</th>
 <th>Category</th>
 <th>Description</th>
+<th>Date</th>
+<th>Action</th>
 </tr>
 
 </table>
+
+<h2>Expense Chart</h2>
+
+<canvas id="expenseChart" width="400" height="200"></canvas>
 
 <script src="/static/script.js"></script>
 

@@ -15,6 +15,7 @@ function startVoice(){
     recognition.start();
 }
 
+
 function processExpense(text){
 
     const words = text.split(" ");
@@ -24,21 +25,27 @@ function processExpense(text){
 
     words.forEach(word => {
 
-        if(!isNaN(word)){
-            amount = word;
-        }
+        word = word.toLowerCase();
 
-        if(word.includes("food") || word.includes("lunch")){
-            category = "Food";
-        }
+if(!isNaN(word)){
+amount = word;
+}
 
-        if(word.includes("grocery")){
-            category = "Groceries";
-        }
+if(word.includes("food") || word.includes("lunch") || word.includes("dinner") || word.includes("breakfast")){
+category = "Food";
+}
 
-        if(word.includes("bill")){
-            category = "Bills";
-        }
+else if(word.includes("grocery") || word.includes("vegetable") || word.includes("market")){
+category = "Groceries";
+}
+
+    else if(word.includes("bill") || word.includes("electricity") || word.includes("rent")){
+    category = "Bills";
+    }
+
+    else if(word.includes("travel") || word.includes("bus") || word.includes("uber")){
+    category = "Transport";
+    }
 
     });
 
@@ -65,7 +72,28 @@ function processExpense(text){
         loadExpenses();
 
     });
+
 }
+
+
+
+function deleteExpense(id){
+
+fetch(`/delete_expense/${id}`,{
+method:"DELETE"
+})
+.then(res => res.json())
+.then(data => {
+
+alert(data.message);
+
+loadExpenses();
+
+});
+
+}
+
+
 
 function loadExpenses(){
 
@@ -82,8 +110,12 @@ table.innerHTML = `
 <th>Amount</th>
 <th>Category</th>
 <th>Description</th>
+<th>Date</th>
+<th>Action</th>
 </tr>
 `;
+
+let categoryTotals = {};
 
 data.forEach(exp => {
 
@@ -92,13 +124,47 @@ table.innerHTML += `
 <td>${exp.amount}</td>
 <td>${exp.category}</td>
 <td>${exp.description}</td>
+<td>${exp.date}</td>
+<td><button onclick="deleteExpense(${exp.id})">Delete</button></td>
 </tr>
 `;
 
+if(!categoryTotals[exp.category]){
+categoryTotals[exp.category] = 0;
+}
+
+categoryTotals[exp.category] += parseInt(exp.amount);
+
 });
+
+drawChart(categoryTotals);
 
 });
 
 }
+
+
+
+function drawChart(data){
+
+const ctx = document.getElementById("expenseChart");
+
+const labels = Object.keys(data);
+
+const values = Object.values(data);
+
+new Chart(ctx,{
+type:'pie',
+data:{
+labels:labels,
+datasets:[{
+data:values
+}]
+}
+});
+
+}
+
+
 
 loadExpenses();

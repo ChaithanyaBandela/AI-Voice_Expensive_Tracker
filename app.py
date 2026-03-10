@@ -13,7 +13,8 @@ def init_db():
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         amount INTEGER,
         category TEXT,
-        description TEXT
+        description TEXT,
+        date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """)
 
@@ -70,10 +71,25 @@ def get_expenses():
             "id": row[0],
             "amount": row[1],
             "category": row[2],
-            "description": row[3]
+            "description": row[3],
+            "date": row[4]
         })
 
     return jsonify(expenses)
+
+
+@app.route("/delete_expense/<int:id>", methods=["DELETE"])
+def delete_expense(id):
+
+    conn = sqlite3.connect("expenses.db")
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM expenses WHERE id=?", (id,))
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({"message":"Expense deleted"})
 
 
 if __name__ == "__main__":
